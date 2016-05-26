@@ -1,0 +1,5 @@
+{
+  "name": "ota-server",
+  "description": "Server OTA images to nodes by HTTP request.",
+  "version": "0.0.1"
+}
