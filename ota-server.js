@@ -18,7 +18,7 @@ server.on('request', function(req, res) {
   var data_length = parseInt( path_arguments[2] );
   console.log( "Requesting data:\t" + data_start_position + "\t" + (data_start_position+data_length) );
 
-  if (data_start_position > firmware_binary.length) {
+  if (data_start_position >= firmware_binary.length) {
     //  If there's no more firmware, just send back an empty page (0xff)!
     res.writeHead( 200, {'Content-Type': 'text/plain'} );
     res.end("EOF");
