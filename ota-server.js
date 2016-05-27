@@ -1,15 +1,28 @@
 var http = require('http');
+var url = require('url');
 
-host = "::1";
+host = "bbbb::1";
 port = 3003;
 
 var server = http.createServer();
 
+var arr = [];
+for (var i=0; i<0x1000; i++) {
+  arr[i] = i%0xff;
+}
+var uarr = new Uint8Array( arr );
+
 server.on('request', function(req, res) {
-  console.log( req );
+  // (1) Parse request arguments
+  request_parts = url.parse( req.url );
+  path_arguments = request_parts.path.split("/");
+  var data_start_position = parseInt( path_arguments[1] );
+  var data_length = parseInt( path_arguments[2] );
+  console.log( "Return data from " + data_start_position + " to " + (data_start_position+data_length) );
+
   res.writeHead( 200, {'Content-Type': 'application/octet-stream'} );
-  var bin_data = new Uint8Array([0, 80, 0, 32]); // this will be our .bin file
-  res.end( new Buffer(bin_data, "binary") );
+  data = uarr.subarray( data_start_position, (data_start_position+data_length) ); 
+  res.end( new Buffer(data, "binary") );
 });
 
 server.on('listening', function() {
