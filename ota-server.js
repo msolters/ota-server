@@ -1,16 +1,14 @@
 var http = require('http');
 var url = require('url');
-
-host = "bbbb::1";
-port = 3003;
+var fs = require('fs');
 
 var server = http.createServer();
+host = "::1";
+port = 3003;
 
-var arr = [];
-for (var i=0; i<0x1000; i++) {
-  arr[i] = i%0xff;
-}
-var uarr = new Uint8Array( arr );
+var firmware_binary = fs.readFileSync('ota-image-example.bin');
+//console.log( firmware_binary.toString('hex') );
+console.log( firmware_binary.length );
 
 server.on('request', function(req, res) {
   // (1) Parse request arguments
@@ -18,11 +16,19 @@ server.on('request', function(req, res) {
   path_arguments = request_parts.path.split("/");
   var data_start_position = parseInt( path_arguments[1] );
   var data_length = parseInt( path_arguments[2] );
-  console.log( "Return data from " + data_start_position + " to " + (data_start_position+data_length) );
+  console.log( "Requesting data:\t" + data_start_position + "\t" + (data_start_position+data_length) );
 
-  res.writeHead( 200, {'Content-Type': 'application/octet-stream'} );
-  data = uarr.subarray( data_start_position, (data_start_position+data_length) ); 
-  res.end( new Buffer(data, "binary") );
+  if (data_start_position > firmware_binary.length) {
+    //  If there's no more firmware, just send back an empty page (0xff)!
+    res.writeHead( 200, {'Content-Type': 'text/plain'} );
+    res.end("EOF");
+  } else {
+    //  Make sure we don't read past the end of the firmware.
+    var data_end_position = Math.min( (data_start_position + data_length), firmware_binary.length );
+    data = firmware_binary.slice( data_start_position, data_end_position );
+    res.writeHead( 200, {'Content-Type': 'application/octet-stream'} );
+    res.end( data );
+  }
 });
 
 server.on('listening', function() {
