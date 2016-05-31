@@ -3,15 +3,17 @@ var url = require('url');
 var fs = require('fs');
 
 var server = http.createServer();
+//  Our OTA server will use IPv6 address bbbb::1, port 3003
+//  Feel free to use any IPv4 or IPv6 address that your nodes can resolve!
 host = "bbbb::1";
 port = 3003;
 
+//  Read the OTA binary into a buffer to be served on request
 var firmware_binary = fs.readFileSync('ota-image-example.bin');
-//console.log( firmware_binary.toString('hex') );
-//console.log( firmware_binary.length );
 
+//  Here's where we process HTTP requests for chunks of the firmware_binary
 server.on('request', function(req, res) {
-  // (1) Parse request arguments
+  // (1) Parse URL path to obtain the data_start and data_length parameters
   request_parts = url.parse( req.url );
   path_arguments = request_parts.path.split("/");
   
