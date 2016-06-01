@@ -13,7 +13,7 @@ var firmware = {
   binary: fs.readFileSync('ota-image-example.bin'),
   version: 0x1,
   uuid: 0xabcd
-};_binary = 
+};
 
 //  Here's where we process HTTP requests for chunks of the firmware_binary
 server.on('request', function(req, res) {
