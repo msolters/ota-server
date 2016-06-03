@@ -10,9 +10,10 @@ port = 3003;
 
 //  Configure the firmware to be served OTA
 var firmware = {
-  binary: fs.readFileSync('ota-image-example.bin'),
-  version: 0x1,
-  uuid: 0xabcd
+  binary: fs.readFileSync( process.argv[2] ),
+  version: parseInt( process.argv[3] ),
+  uuid: parseInt( process.argv[4] ),
+  crc: parseInt( process.argv[5] )
 };
 
 //  Here's where we process HTTP requests for chunks of the firmware_binary
@@ -20,16 +21,16 @@ server.on('request', function(req, res) {
   // (1) Parse URL path to obtain the data_start and data_length parameters
   request_parts = url.parse( req.url );
   path_arguments = request_parts.path.split("/");
-  
+
   if ( path_arguments[1] == "metadata" ) {
     metadata = new Buffer( 16 );
-    metadata.writeUInt16LE( 0x0000, 0 ); // crc
-    metadata.writeUInt16LE( 0x0000, 2 ); // crc shadow
+    metadata.writeUInt16LE( firmware.crc, 0 ); // crc
+    metadata.writeUInt16LE( 0x0000, 2 ); // crc shadow - this will be calculated by the node
     metadata.writeUInt32LE( firmware.binary.length, 4 ); // binary size
     metadata.writeUInt32LE( firmware.uuid, 8 ); // uuid
     metadata.writeUInt16LE( firmware.version, 12 ); // version
     metadata.writeUInt16LE( 0x0, 14 ); // 4-byte alignment padding
-    
+
     res.writeHead( 200, {'Content-Type': 'application/octet-stream'} );
     res.end( metadata );
   } else {
