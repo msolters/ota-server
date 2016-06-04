@@ -1,5 +1,7 @@
 # OTA Image Server
-This is an OTA firmware image server for CC2650-based devices running Contiki.  This server is an incredibly simply HTTP server.  It simply reads the OTA image file `ota-image-example.bin`, and serves it in chunks over GET requests originating from Contiki nodes.
+This is an OTA firmware image server for CC2650-based devices running Contiki.  This server is an incredibly simple HTTP server.  It reads the OTA image file `ota-image-example.bin`, and serves it in chunks over GET requests originating from Contiki nodes.  
+
+>  Please note this server will not automatically work with any .bin file.  You must specifically compile your Contiki app to be an OTA image, with associated metadata (version number, UUID, CRC checksum).
 
 ## Dependencies
 This server is a Node.JS server so you will need the `node` binary to run it.  For most Debian distros the command to install NodeJS is
