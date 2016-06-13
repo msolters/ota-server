@@ -1,5 +1,8 @@
 {
   "name": "ota-server",
-  "description": "Server OTA images to nodes by HTTP request.",
-  "version": "0.0.1"
+  "description": "Server OTA images to nodes by COAP request.",
+  "version": "0.0.1",
+  "dependencies": {
+    "coap": ">=0.12.1"
+  }
 }
