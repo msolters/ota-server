@@ -11,6 +11,7 @@ var firmware_binary = fs.readFileSync( process.argv[2] );
 //  Here's where we process HTTP requests for chunks of the firmware_binary
 server.on('request', function(req, res) {
   // (1) Parse URL path to obtain the data_start and data_length parameters
+  console.log("Received CoAP request: " + req.url);
   request_parts = url.parse( req.url );
   path_arguments = request_parts.path.split("/");
   var data_start_position = parseInt( path_arguments[1] );
