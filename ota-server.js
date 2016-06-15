@@ -7,12 +7,28 @@ var server = coap.createServer({ type: 'udp6' });
 
 //  Configure the firmware to be served OTA
 var firmware_binary = fs.readFileSync( process.argv[2] );
+console.log( firmware_binary.length );
 
 //  Here's where we process HTTP requests for chunks of the firmware_binary
 server.on('request', function(req, res) {
   // (1) Parse URL path to obtain the data_start and data_length parameters
+  console.log( req.url );
   request_parts = url.parse( req.url );
   path_arguments = request_parts.path.split("/");
+  
+
+  if (path_arguments[1] == "ota") {
+    //var data_start = parseInt( path_arguments[2] );
+    console.log( req.url );
+    data_start = req.payload.readUInt32LE(0);
+    console.log("Requesting firmware starting from address " + data_start);
+    
+    res.end( firmware_binary.slice(data_start, firmware_binary.length) );
+    //res.end( firmware_binary );
+    return;
+  }
+
+/*
   var data_start_position = parseInt( path_arguments[1] );
   var data_length = parseInt( path_arguments[2] );
   console.log( "Requesting data:\t" + data_start_position + "\t" + (data_start_position+data_length) );
@@ -28,10 +44,7 @@ server.on('request', function(req, res) {
     console.log("\tSending " + data.length + " bytes.");
     res.end( data );
   }
-});
-
-server.on('listening', function() {
-
+*/
 });
 
 server.listen( function() {
